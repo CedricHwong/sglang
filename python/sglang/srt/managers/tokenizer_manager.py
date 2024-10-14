@@ -473,7 +473,7 @@ class TokenizerManager:
                     decoded_text = self.tokenizer.decode(obj.input_ids)
                 else:
                     decoded_text = obj.text
-                logger.info(f"in=Decoded Text: {decoded_text}, out={out}")
+                logger.info(f"Input Text: {decoded_text}, Sampling params={obj}, Output Text={out}")
                 # logger.info(f"in={obj}, out={out}")
 
             state.out_list = []
