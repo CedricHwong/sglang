@@ -18,7 +18,7 @@ class MockSamplingParams:
     min_new_tokens: int = 0
     stop_token_ids: typing.List[int] = None
     presence_penalty: float = 0.0
-    repetition_penalty: float = 1.0
+    repetition_penalty: float = 1.05
 
 
 @dataclasses.dataclass

@@ -3,7 +3,11 @@ FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu20.04
 ARG BUILD_TYPE=all
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN echo 'tzdata tzdata/Areas select America' | debconf-set-selections \
+RUN echo 'deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse' > /etc/apt/sources.list \
+    && echo 'deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list \
+    && echo 'deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list \
+    && echo 'deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list  \
+    && echo 'tzdata tzdata/Areas select America' | debconf-set-selections \
     && echo 'tzdata tzdata/Zones/America select Los_Angeles' | debconf-set-selections \
     && apt update -y \
     && apt install software-properties-common -y \
@@ -24,7 +28,7 @@ RUN pip3 install datamodel_code_generator
 WORKDIR /sgl-workspace
 
 RUN python3 -m pip install --upgrade pip setuptools wheel html5lib six \
-    && git clone --depth=1 https://github.com/CedricHwong/sglang.git \
+    && git clone  https://github.com/CedricHwong/sglang.git \
     && cd sglang \
     && if [ "$BUILD_TYPE" = "srt" ]; then \
          python3 -m pip --no-cache-dir install -e "python[srt]"; \
