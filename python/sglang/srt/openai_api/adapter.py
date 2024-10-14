@@ -501,7 +501,7 @@ def v1_generate_request(
                 "top_p": request.top_p,
                 "presence_penalty": request.presence_penalty,
                 "frequency_penalty": request.frequency_penalty,
-                "repetition_penalty": request.repetition_penalty,
+                "repetition_penalty": 1.05,
                 "regex": request.regex,
                 "json_schema": request.json_schema,
                 "n": request.n,
