@@ -19,6 +19,7 @@ import asyncio
 import dataclasses
 import json
 import logging
+from datetime import datetime
 import os
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -62,6 +63,9 @@ from sglang.srt.utils import is_generation_model, is_multimodal_model
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
+
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -72,6 +76,29 @@ class ReqState:
     out_list: List
     finished: bool
     event: asyncio.Event
+
+class CustomAdapter(logging.LoggerAdapter):
+    def process(self, msg, kwargs):
+        obj = kwargs.pop('obj', None)
+        out = kwargs.pop('out', None)
+
+        if obj.input_ids is not None:
+            input_text = self.tokenizer.decode(obj.input_ids, skip_special_tokens=True)
+        else:
+            input_text = obj.text
+
+        log_entry = {
+            'Timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'Input_text': input_text,
+            'sampling_param': getattr(obj, 'sampling_params', None),
+            'rid': getattr(obj, 'rid', None),
+            'stream': getattr(obj, 'stream', None),
+            'Output_text': out.get('text') if out else None,
+            'Output_metainfo': out.get('meta_info') if out else None
+        }
+
+        formatted_msg = f"{log_entry}"
+        return formatted_msg, kwargs
 
 
 class TokenizerManager:
@@ -482,7 +509,10 @@ class TokenizerManager:
 
             # Log requests
             if self.server_args.log_requests and state.finished:
-                logger.info(f"in={obj}, out={out}")
+                adapter = CustomAdapter(logger, {})
+                adapter.tokenizer = TokenizerManager() 
+                # 使用自定义适配器记录日志
+                adapter.info("", extra={'obj': obj, 'out': out})
 
             state.out_list = []
             if state.finished:
